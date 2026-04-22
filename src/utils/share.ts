@@ -1,4 +1,4 @@
-export async function shareResult(typeCode: string, typeName: string, temperature: number) {
+export async function shareResult(_typeCode: string, typeName: string, temperature: number) {
   const text = `나의 소비 온도는 ${temperature}°! 나는 "${typeName}" 유형이래요 🌡️ 너도 테스트 해볼래?`;
   const url = window.location.origin;
 
