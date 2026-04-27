@@ -28,36 +28,35 @@ export default function ResultPage() {
     result.temperature >= 40 ? '#FFD93D' :
     '#6BCBFF';
 
-  // [100% 성공 보장 공유 로직]
-  // 텔레그램 전송 버튼 먹통을 방지하기 위해 텍스트를 아주 단순하게 구성합니다.
+  // [핵심] 공유할 텍스트 구성 (가장 깔끔한 포맷)
   const shareUrl = "https://dongsaengnim.vercel.app";
-  const shareText = `나의 소비 동물은 [${type.animal}]! 🌡️ 소비 온도: ${result.temperature}도\n\n지금 테스트 하기:\n${shareUrl}`;
+  const shareText = `나의 소비 유형은 [${type.animal} — ${type.name}]! 🌡️ 소비 온도: ${result.temperature}도\n\n지금 테스트 해보기:\n${shareUrl}`;
 
-  const handleShare = async () => {
-    // 1. 모바일 시스템 공유 시도
+  // 1. 시스템 공유 (텔레그램 등 앱 연결)
+  const handleSystemShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          text: shareText, // URL 필드를 따로 쓰지 않고 text에 합쳐서 보내는 것이 가장 안전합니다.
+          text: shareText, // URL 필드를 따로 쓰지 않고 텍스트에 합쳐서 보내는 것이 가장 오류가 적습니다.
         });
-        return;
       } catch (e) {
-        // 사용자가 취소한 게 아니라 에러가 난 경우에만 클립보드로 넘어감
+        // 취소한 게 아니라면 복사로 안내
         if ((e as Error).name !== 'AbortError') {
-          copyToClipboard();
+          handleCopyLink();
         }
       }
     } else {
-      copyToClipboard();
+      handleCopyLink();
     }
   };
 
-  const copyToClipboard = async () => {
+  // 2. 링크 복사 (가장 확실한 보험)
+  const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareText);
-      alert('공유 메시지가 복사되었습니다!\n원하는 곳에 붙여넣기(Paste) 해주세요.');
+      alert('공유 메시지와 링크가 복사되었습니다!\n원하는 채팅방에 [붙여넣기] 하세요.');
     } catch (err) {
-      alert('복사에 실패했습니다. 주소창의 링크를 복사해 주세요.');
+      alert('복사에 실패했습니다. 주소창의 링크를 직접 복사해 주세요.');
     }
   };
 
@@ -87,7 +86,7 @@ export default function ResultPage() {
         style={{ width: '200px', height: '200px', objectFit: 'contain', marginBottom: '20px' }}
       />
 
-      {/* 유형 이름 */}
+      {/* 유형 타이틀 */}
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#1e293b', margin: '0' }}>
           {type.animal} — {type.name}
@@ -108,7 +107,7 @@ export default function ResultPage() {
         </div>
       </div>
 
-      {/* 설명 카드 */}
+      {/* 분석 내용 카드 */}
       <div style={{
         width: '100%',
         maxWidth: '400px',
@@ -169,26 +168,26 @@ export default function ResultPage() {
           </button>
         </div>
 
-        {/* 메인 공유 버튼 */}
+        {/* 1. 시스템 공유하기 (카톡, 텔레 등) */}
         <button
-          onClick={handleShare}
+          onClick={handleSystemShare}
           style={{
             width: '100%', padding: '16px', borderRadius: '16px', border: 'none',
             background: '#fbbf24', color: '#451a03', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
           }}
         >
-          📤 결과 공유하기
+          📤 카톡/텔레로 결과 보내기
         </button>
 
-        {/* 링크 복사 전용 버튼 (가장 확실한 보험) */}
+        {/* 2. 링크 복사 (먹통 방지용 보험) */}
         <button
-          onClick={copyToClipboard}
+          onClick={handleCopyLink}
           style={{
-            width: '100%', padding: '14px', borderRadius: '16px', border: '1px solid #cbd5e1',
-            background: 'white', color: '#64748b', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
+            width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid #cbd5e1',
+            background: 'white', color: '#64748b', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
           }}
         >
-          🔗 링크만 복사하기
+          🔗 링크 및 메시지 복사
         </button>
 
         <button
@@ -198,7 +197,7 @@ export default function ResultPage() {
             background: '#f1f5f9', color: '#94a3b8', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginTop: '10px'
           }}
         >
-          🔄 다시 테스트하기
+          🔄 테스트 다시하기
         </button>
       </div>
     </div>
