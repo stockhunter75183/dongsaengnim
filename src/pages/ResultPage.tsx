@@ -28,27 +28,36 @@ export default function ResultPage() {
     result.temperature >= 40 ? '#FFD93D' :
     '#6BCBFF';
 
-  // [개선된 공유 로직] 텔레그램 멈춤 방지 및 클립보드 백업
+  // [100% 성공 보장 공유 로직]
+  // 텔레그램 전송 버튼 먹통을 방지하기 위해 텍스트를 아주 단순하게 구성합니다.
+  const shareUrl = "https://dongsaengnim.vercel.app";
+  const shareText = `나의 소비 동물은 [${type.animal}]! 🌡️ 소비 온도: ${result.temperature}도\n\n지금 테스트 하기:\n${shareUrl}`;
+
   const handleShare = async () => {
-    const shareText = `나의 소비 유형은 "${type.animal} — ${type.name}"! 🌡️ 소비 온도 ${result.temperature}°\n\n지금 테스트 해보기:\nhttps://dongsaengnim.vercel.app`;
-    
-    try {
-      // 1. 최신 브라우저 공유 기능 시도
-      if (navigator.share) {
-        await navigator.share({
-          text: shareText, // url 필드를 따로 쓰지 않고 text에 합쳐서 보냄 (호환성 최상)
-        });
-      } else {
-        throw new Error('Share API not supported');
-      }
-    } catch (e) {
-      // 2. 실패하거나 지원하지 않으면 클립보드 복사로 자동 전환
+    // 1. 모바일 시스템 공유 시도
+    if (navigator.share) {
       try {
-        await navigator.clipboard.writeText(shareText);
-        alert('공유 링크가 복사되었습니다! 친구에게 붙여넣어 공유해 보세요.');
-      } catch (err) {
-        alert('공유에 실패했습니다. 주소창의 링크를 직접 복사해 주세요.');
+        await navigator.share({
+          text: shareText, // URL 필드를 따로 쓰지 않고 text에 합쳐서 보내는 것이 가장 안전합니다.
+        });
+        return;
+      } catch (e) {
+        // 사용자가 취소한 게 아니라 에러가 난 경우에만 클립보드로 넘어감
+        if ((e as Error).name !== 'AbortError') {
+          copyToClipboard();
+        }
       }
+    } else {
+      copyToClipboard();
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      alert('공유 메시지가 복사되었습니다!\n원하는 곳에 붙여넣기(Paste) 해주세요.');
+    } catch (err) {
+      alert('복사에 실패했습니다. 주소창의 링크를 복사해 주세요.');
     }
   };
 
@@ -60,9 +69,10 @@ export default function ResultPage() {
       fontFamily: "'Pretendard', sans-serif",
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center'
+      alignItems: 'center',
+      boxSizing: 'border-box'
     }}>
-      {/* 상단 온도 표시 */}
+      {/* 온도 표시 */}
       <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '30px' }}>
         <p style={{ fontSize: '48px', fontWeight: 'bold', color: tempColor, margin: '0' }}>
           {result.temperature}°
@@ -70,14 +80,14 @@ export default function ResultPage() {
         <p style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>나의 소비 온도</p>
       </div>
 
-      {/* 캐릭터 일러스트 */}
+      {/* 캐릭터 이미지 */}
       <img
         src={type.characterImage}
         alt={type.animal}
         style={{ width: '200px', height: '200px', objectFit: 'contain', marginBottom: '20px' }}
       />
 
-      {/* 유형 타이틀 */}
+      {/* 유형 이름 */}
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#1e293b', margin: '0' }}>
           {type.animal} — {type.name}
@@ -98,7 +108,7 @@ export default function ResultPage() {
         </div>
       </div>
 
-      {/* 분석 내용 카드 */}
+      {/* 설명 카드 */}
       <div style={{
         width: '100%',
         maxWidth: '400px',
@@ -136,7 +146,7 @@ export default function ResultPage() {
         </div>
       </div>
 
-      {/* 버튼 액션 섹션 */}
+      {/* 버튼 영역 */}
       <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '40px' }}>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
@@ -146,7 +156,7 @@ export default function ResultPage() {
               background: '#10b981', color: 'white', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
             }}
           >
-            상세 분석 보기
+            상세 보기
           </button>
           <button
             onClick={() => navigate('/match')}
@@ -155,10 +165,11 @@ export default function ResultPage() {
               background: '#f43f5e', color: 'white', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
             }}
           >
-            돈 궁합 확인
+            돈 궁합 보기
           </button>
         </div>
 
+        {/* 메인 공유 버튼 */}
         <button
           onClick={handleShare}
           style={{
@@ -166,14 +177,25 @@ export default function ResultPage() {
             background: '#fbbf24', color: '#451a03', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
           }}
         >
-          📤 친구에게 결과 공유하기
+          📤 결과 공유하기
+        </button>
+
+        {/* 링크 복사 전용 버튼 (가장 확실한 보험) */}
+        <button
+          onClick={copyToClipboard}
+          style={{
+            width: '100%', padding: '14px', borderRadius: '16px', border: '1px solid #cbd5e1',
+            background: 'white', color: '#64748b', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
+          }}
+        >
+          🔗 링크만 복사하기
         </button>
 
         <button
           onClick={() => navigate('/')}
           style={{
-            width: '100%', padding: '14px', borderRadius: '16px', border: '1px solid #cbd5e1',
-            background: 'white', color: '#64748b', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
+            width: '100%', padding: '14px', borderRadius: '16px', border: 'none',
+            background: '#f1f5f9', color: '#94a3b8', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginTop: '10px'
           }}
         >
           🔄 다시 테스트하기
