@@ -23,6 +23,28 @@ export default function ResultPage() {
     result.temperature >= 40 ? '#FFD93D' :
     '#6BCBFF';
 
+  const handleShare = async () => {
+    const shareText = `나의 소비 유형은 "${type.animal} — ${type.name}"이래! 🌡️ 소비 온도 ${result.temperature}°\n너도 테스트 해봐!\nhttps://dongsaengnim.vercel.app`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: '돈생님 - 나의 소비 온도 테스트',
+          text: shareText,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        alert('링크가 복사되었어요! 붙여넣기로 공유하세요.');
+      }
+    } catch (e) {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert('링크가 복사되었어요! 붙여넣기로 공유하세요.');
+      } catch {
+        alert('공유에 실패했어요. 링크를 직접 복사해주세요.');
+      }
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -140,21 +162,7 @@ export default function ResultPage() {
 
         {/* 공유 버튼 */}
         <button
-          onClick={async () => {
-            const shareData = {
-              title: '돈생님 - 나의 소비 온도 테스트',
-              text: `나의 소비 유형은 "${type.animal} — ${type.name}"이래! 🌡️ 소비 온도 ${result.temperature}°\n너도 테스트 해봐!`,
-              url: 'https://dongsaengnim.vercel.app',
-            };
-            if (navigator.share) {
-              await navigator.share(shareData);
-            } else {
-              await navigator.clipboard.writeText(
-                `${shareData.text}\n${shareData.url}`
-              );
-              alert('링크가 복사되었어요! 붙여넣기로 공유하세요.');
-            }
-          }}
+          onClick={handleShare}
           style={{
             width: '100%',
             padding: '16px',
