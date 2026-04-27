@@ -1,72 +1,112 @@
+// src/components/CPARecommend.tsx
+
 interface Product {
+  category: string;
+  categoryColor: string;
   name: string;
-  company: string;
+  provider: string;
   description: string;
-  tag: string;
-  color: string;
 }
 
-const productMap: Record<string, Product[]> = {
+const productsByType: Record<string, Product[]> = {
   HTCS: [
-    { name: '토스 먼저 이자 받는 예금', company: '토스뱅크', description: '매월 이자를 먼저 받아서 소비에 활용 가능!', tag: '예금', color: '#3182F6' },
-    { name: '카카오페이 26주 적금', company: '카카오뱅크', description: '매주 소액 저축으로 습관 만들기', tag: '적금', color: '#FEE500' },
+    { category: '카드', categoryColor: '#FF6B6B', name: '토스 FLEX 신용카드', provider: '토스뱅크', description: '쇼핑·외식 5% 캐시백으로 플렉스 극대화' },
+    { category: '저축', categoryColor: '#2EC4B6', name: '26주 적금 챌린지', provider: '토스뱅크', description: '매주 조금씩 늘려가는 자동 저축 습관 만들기' },
   ],
   HTCT: [
-    { name: '토스 모임통장', company: '토스뱅크', description: '친구들과 함께 모으는 모임통장', tag: '모임', color: '#3182F6' },
-    { name: '카카오페이 저금통', company: '카카오뱅크', description: '잔돈 자동 저축으로 부담 없이 시작', tag: '저축', color: '#FEE500' },
+    { category: '카드', categoryColor: '#FF6B6B', name: '토스 모임통장 체크카드', provider: '토스뱅크', description: '모임비 관리와 더치페이가 한번에' },
+    { category: '보험', categoryColor: '#9B59B6', name: '해외여행자 보험', provider: '토스 인슈어런스', description: '친구들과 여행 전 3초 가입, 1일 690원부터' },
   ],
   HSTS: [
-    { name: '토스 목표 저금통', company: '토스', description: '목표 금액 설정하고 자동 저축', tag: '저축', color: '#3182F6' },
-    { name: 'CMA 통장', company: '증권사', description: '자유입출금 + 예금보다 높은 이자', tag: '투자', color: '#00C853' },
+    { category: '저축', categoryColor: '#2EC4B6', name: '토스 목표 저금통', provider: '토스', description: '세일로 아낀 금액만큼 자동 저축해보세요' },
+    { category: '투자', categoryColor: '#3498DB', name: '소액 주식 투자', provider: '토스증권', description: '1000원부터 시작하는 주식 투자' },
   ],
   HSTT: [
-    { name: '토스 모임통장', company: '토스뱅크', description: '모임비 관리에 최적화된 통장', tag: '모임', color: '#3182F6' },
-    { name: '주간 자동이체 적금', company: '시중은행', description: '매주 소액씩 자동 저축', tag: '적금', color: '#FF9800' },
+    { category: '카드', categoryColor: '#FF6B6B', name: '토스 모임통장 체크카드', provider: '토스뱅크', description: '모임비 자동 정산, 공동구매 관리에 딱' },
+    { category: '투자', categoryColor: '#3498DB', name: '투자 스터디 모임', provider: '토스증권', description: '친구와 함께 소액 투자 시작하기' },
   ],
   CTCS: [
-    { name: 'ETF 자동투자', company: '토스증권', description: '매월 자동으로 ETF에 분산투자', tag: '투자', color: '#3182F6' },
-    { name: '파킹통장', company: '토스뱅크', description: '쓰기 전까지 이자가 붙는 통장', tag: '예금', color: '#00C853' },
+    { category: '투자', categoryColor: '#3498DB', name: 'ETF 자동투자', provider: '토스증권', description: '매월 자동으로 분산투자, 계획적 자산 증식' },
+    { category: '저축', categoryColor: '#2EC4B6', name: '시즌별 쇼핑 예산 적금', provider: '토스뱅크', description: '분기별 쇼핑 예산을 미리 모아두세요' },
   ],
   CTCT: [
-    { name: '토스 함께 투자하기', company: '토스증권', description: '친구와 함께 소액 투자 시작', tag: '투자', color: '#3182F6' },
-    { name: '경조사 예산 통장', company: '시중은행', description: '연간 경조사비를 미리 준비', tag: '저축', color: '#FF9800' },
+    { category: '카드', categoryColor: '#FF6B6B', name: '토스 경조사 봉투', provider: '토스', description: '경조사비 송금과 메시지를 한번에' },
+    { category: '투자', categoryColor: '#3498DB', name: '함께 투자 랭킹', provider: '토스증권', description: '친구들과 수익률 비교하며 재테크' },
   ],
   CSSS: [
-    { name: 'ISA 계좌', company: '증권사', description: '절세 혜택으로 투자 수익 극대화', tag: '절세', color: '#7C4DFF' },
-    { name: 'ETF 분산투자', company: '토스증권', description: '저축을 넘어 투자로! 리스크 분산', tag: '투자', color: '#3182F6' },
+    { category: '투자', categoryColor: '#3498DB', name: '예금 금리 비교', provider: '토스', description: '최고 금리 예적금을 한눈에 비교하세요' },
+    { category: '투자', categoryColor: '#3498DB', name: 'CMA 통장', provider: '토스증권', description: '하루만 맡겨도 이자가 붙는 똑똑한 통장' },
   ],
   CSST: [
-    { name: '토스 목표 저금통', company: '토스', description: '함께 목표 설정하고 저축하기', tag: '저축', color: '#3182F6' },
-    { name: '소액 주식 투자', company: '토스증권', description: '1000원부터 시작하는 주식 투자', tag: '투자', color: '#00C853' },
+    { category: '저축', categoryColor: '#2EC4B6', name: '토스 목표 저금통', provider: '토스', description: '함께 목표 설정하고 저축하기' },
+    { category: '투자', categoryColor: '#3498DB', name: '소액 주식 투자', provider: '토스증권', description: '1000원부터 시작하는 주식 투자' },
   ],
 };
 
-export default function CPARecommend({ typeCode }: { typeCode: string }) {
-  const products = productMap[typeCode] || productMap['CSST'];
+interface Props {
+  typeCode: string;
+}
+
+export default function CPARecommend({ typeCode }: Props) {
+  const products = productsByType[typeCode] || productsByType['CSST'];
 
   return (
-    <div>
+    <div style={{
+      width: '100%',
+      background: 'white',
+      borderRadius: '16px',
+      padding: '20px',
+      marginBottom: '16px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    }}>
       <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
         💰 돈생님 추천 금융상품
       </h3>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {products.map((product, index) => (
-          <div key={index} style={{
-            background: 'white', borderRadius: '16px', padding: '16px',
-            border: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', gap: '14px',
-          }}>
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '14px',
+              background: '#F8F9FA',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F0F0F0'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#F8F9FA'; }}
+          >
+            {/* 카테고리 배지 */}
             <div style={{
-              width: '48px', height: '48px', borderRadius: '12px',
-              background: product.color, display: 'flex', alignItems: 'center',
-              justifyContent: 'center', color: 'white', fontSize: '14px',
-              fontWeight: 'bold', flexShrink: 0,
+              minWidth: '48px',
+              height: '48px',
+              background: product.categoryColor,
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '13px',
+              fontWeight: 'bold',
             }}>
-              {product.tag}
+              {product.category}
             </div>
+
+            {/* 상품 정보 */}
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '2px' }}>{product.name}</p>
-              <p style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{product.company}</p>
-              <p style={{ fontSize: '13px', color: '#555', lineHeight: 1.4 }}>{product.description}</p>
+              <p style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '2px' }}>
+                {product.name}
+              </p>
+              <p style={{ fontSize: '12px', color: '#888', marginBottom: '2px' }}>
+                {product.provider}
+              </p>
+              <p style={{ fontSize: '13px', color: '#2EC4B6' }}>
+                {product.description}
+              </p>
             </div>
           </div>
         ))}

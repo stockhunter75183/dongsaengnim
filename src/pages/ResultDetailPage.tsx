@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTestStore } from '../store/useTestStore';
 import { moneyTypes } from '../data/types';
@@ -8,165 +7,160 @@ export default function ResultDetailPage() {
   const navigate = useNavigate();
   const result = useTestStore((s) => s.result);
 
- useEffect(() => {
-  if (!result) navigate('/');
-}, [result, navigate]);
-
-if (!result) return null;
-
+  if (!result) {
+    navigate('/');
+    return null;
+  }
 
   const type = moneyTypes[result.code];
-  if (!type) return <div>오류가 발생했어요.</div>;
+  if (!type) {
+    navigate('/');
+    return null;
+  }
 
-  const tempColor =
-    result.temperature >= 70 ? '#FF6B6B' :
-    result.temperature >= 40 ? '#FFD93D' : '#6BCBFF';
-
-  // 축별 해석
-  const axisLabels = {
-    HC: result.axisScores.HC <= 6
-      ? { icon: '🔥', label: '뜨거운 소비', desc: '충동적이고 즉흥적인 소비 성향' }
-      : { icon: '🧊', label: '차가운 계획', desc: '계획적이고 신중한 소비 성향' },
-    TS: result.axisScores.TS <= 6
-      ? { icon: '✨', label: '트렌드 추구', desc: '유행과 감성을 중시하는 소비' }
-      : { icon: '🔧', label: '실용 추구', desc: '가성비와 내구성을 중시하는 소비' },
-    CS: result.axisScores.CS <= 6
-      ? { icon: '💸', label: '소비 지향', desc: '현재의 행복에 투자하는 스타일' }
-      : { icon: '🏦', label: '저축 지향', desc: '미래의 안정을 위해 모으는 스타일' },
-    ST: result.axisScores.ST <= 6
-      ? { icon: '🧘', label: '솔로 소비', desc: '혼자 판단하고 결정하는 소비' }
-      : { icon: '👥', label: '함께 소비', desc: '사람들과 나누고 공유하는 소비' },
-  };
+  const bestMatch = type.bestMatch ? moneyTypes[type.bestMatch] : null;
+  const worstMatch = type.worstMatch ? moneyTypes[type.worstMatch] : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8F9FA', paddingBottom: '40px' }}>
-      {/* 상단 헤더 */}
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f0f4ff 0%, #e8f5e9 100%)',
+      padding: '20px',
+      fontFamily: "'Pretendard', sans-serif",
+    }}>
+      {/* 헤더 */}
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <img
+          src={type.characterImage}
+          alt={type.animal}
+          style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+        />
+        <h1 style={{ fontSize: '22px', margin: '12px 0 4px' }}>
+          {type.animal} — {type.name}
+        </h1>
+        <p style={{ fontSize: '14px', color: '#888' }}>{type.title}</p>
+      </div>
+
+      {/* 섹션 1: 상세 설명 */}
       <div style={{
-        background: 'linear-gradient(135deg, #2EC4B6 0%, #0B3D91 100%)',
-        padding: '24px 20px', color: 'white', textAlign: 'center',
+        background: 'white', borderRadius: '16px', padding: '20px',
+        marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       }}>
-        <div style={{ fontSize: '36px', marginBottom: '4px' }}>{type.emoji}</div>
-        <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginBottom: '4px' }}>{type.name}</h1>
-        <div style={{
-          display: 'inline-block', padding: '4px 12px', background: 'rgba(255,255,255,0.2)',
-          borderRadius: '12px', fontSize: '14px', marginBottom: '8px',
-        }}>
-          소비 온도 <span style={{ fontWeight: 'bold', color: tempColor }}>{result.temperature}°</span>
+        <h2 style={{ fontSize: '16px', marginBottom: '12px' }}>🔍 상세 분석</h2>
+        <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#444' }}>
+          {type.description}
+        </p>
+      </div>
+
+      {/* 섹션 2: 강점 & 팁 */}
+      <div style={{
+        background: 'white', borderRadius: '16px', padding: '20px',
+        marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      }}>
+        <h2 style={{ fontSize: '16px', marginBottom: '12px' }}>💪 강점</h2>
+        <ul style={{ fontSize: '14px', lineHeight: '1.8', color: '#444', paddingLeft: '20px', marginBottom: '16px' }}>
+          {type.strengths?.map((s: string, i: number) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
+        <h2 style={{ fontSize: '16px', marginBottom: '12px' }}>💡 돈생님의 팁</h2>
+        <ul style={{ fontSize: '14px', lineHeight: '1.8', color: '#444', paddingLeft: '20px' }}>
+          {type.tips?.map((t: string, i: number) => (
+            <li key={i}>{t}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 섹션 3: 궁합 */}
+      <div style={{
+        background: 'white', borderRadius: '16px', padding: '20px',
+        marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      }}>
+        <h2 style={{ fontSize: '16px', marginBottom: '16px' }}>💕 돈 궁합</h2>
+
+        {bestMatch && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            background: '#f0fdf4', borderRadius: '12px', padding: '14px', marginBottom: '12px',
+          }}>
+            <img src={bestMatch.characterImage} alt={bestMatch.animal}
+              style={{ width: '50px', height: '50px', objectFit: 'contain' }} />
+            <div>
+              <p style={{ fontSize: '13px', color: '#16a34a', fontWeight: 'bold' }}>✅ 최고의 궁합</p>
+              <p style={{ fontSize: '15px', fontWeight: '600' }}>{bestMatch.animal} — {bestMatch.name}</p>
+            </div>
+          </div>
+        )}
+
+        {worstMatch && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            background: '#fef2f2', borderRadius: '12px', padding: '14px',
+          }}>
+            <img src={worstMatch.characterImage} alt={worstMatch.animal}
+              style={{ width: '50px', height: '50px', objectFit: 'contain' }} />
+            <div>
+              <p style={{ fontSize: '13px', color: '#dc2626', fontWeight: 'bold' }}>⚠️ 주의할 궁합</p>
+              <p style={{ fontSize: '15px', fontWeight: '600' }}>{worstMatch.animal} — {worstMatch.name}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 섹션 4: 금융상품 추천 */}
+      <div style={{
+        background: 'white', borderRadius: '16px', padding: '20px',
+        marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      }}>
+        <CPARecommend typeCode={result.code} />
+      </div>
+
+      {/* 돈생님 한마디 */}
+      <div style={{
+        background: 'white', borderRadius: '16px', padding: '20px',
+        marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        display: 'flex', gap: '12px', alignItems: 'flex-start',
+      }}>
+        <img src="/characters/teacher-cat.png" alt="돈생님"
+          style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />
+        <div>
+          <p style={{ fontSize: '13px', color: '#888', marginBottom: '4px', fontWeight: 'bold' }}>🐱 돈생님 한마디</p>
+          <p style={{ fontSize: '14px', lineHeight: '1.7', color: '#333' }}>{type.comment}</p>
         </div>
       </div>
 
-      <div style={{ padding: '20px' }}>
-
-        {/* 섹션 1: 축별 분석 */}
-        <div style={{
-          background: 'white', borderRadius: '16px', padding: '20px',
-          marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
-            📊 나의 소비 성향 분석
-          </h3>
-          {Object.entries(axisLabels).map(([key, val]) => {
-            const score = result.axisScores[key as keyof typeof result.axisScores];
-            const percent = ((score - 3) / 6) * 100;
-            return (
-              <div key={key} style={{ marginBottom: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{val.icon} {val.label}</span>
-                  <span style={{ fontSize: '12px', color: '#888' }}>{val.desc}</span>
-                </div>
-                <div style={{ width: '100%', height: '8px', background: '#E8E8E8', borderRadius: '4px' }}>
-                  <div style={{
-                    width: `${percent}%`, height: '100%', borderRadius: '4px',
-                    background: 'linear-gradient(90deg, #2EC4B6, #0B3D91)',
-                    transition: 'width 0.5s ease',
-                  }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 섹션 2: 나의 장점 */}
-        <div style={{
-          background: 'white', borderRadius: '16px', padding: '20px',
-          marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>
-            💪 나의 소비 장점
-          </h3>
-          {type.strengths.map((s, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '10px 0', borderBottom: i < type.strengths.length - 1 ? '1px solid #F0F0F0' : 'none',
-            }}>
-              <div style={{
-                width: '28px', height: '28px', borderRadius: '50%',
-                background: '#E8F8F5', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', fontSize: '14px', fontWeight: 'bold',
-                color: '#2EC4B6', flexShrink: 0,
-              }}>
-                {i + 1}
-              </div>
-              <p style={{ fontSize: '14px', color: '#333', lineHeight: 1.5 }}>{s}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* 섹션 3: 돈 관리 팁 */}
-        <div style={{
-          background: 'white', borderRadius: '16px', padding: '20px',
-          marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>
-            💡 돈생님의 맞춤 팁
-          </h3>
-          {type.tips.map((tip, i) => (
-            <div key={i} style={{
-              background: '#F8F9FA', borderRadius: '12px', padding: '14px',
-              marginBottom: i < type.tips.length - 1 ? '10px' : '0',
-            }}>
-              <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6 }}>
-                {i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : '🥉 '}{tip}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* 섹션 4: 금융상품 추천 */}
-        <div style={{
-          background: 'white', borderRadius: '16px', padding: '20px',
-          marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}>
-          <CPARecommend typeCode={result.code} />
-        </div>
-
-        {/* 돈생님 코멘트 */}
-        <div style={{
-          background: '#FFF9E6', borderRadius: '16px', padding: '16px 20px',
-          marginBottom: '24px', border: '1px solid #FFE08A',
-        }}>
-          <p style={{ fontSize: '14px', color: '#B8860B', lineHeight: 1.6 }}>
-            💬 돈생님 한마디: {type.comment}
-          </p>
-        </div>
-
-        {/* 버튼들 */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-          <button onClick={() => navigate('/result')} style={{
-            flex: 1, padding: '14px', fontSize: '15px', fontWeight: 'bold',
-            background: 'white', color: '#333', border: '1px solid #DDD',
-            borderRadius: '12px', cursor: 'pointer',
-          }}>
-            ← 결과 요약
-          </button>
-          <button onClick={() => navigate('/')} style={{
-            flex: 1, padding: '14px', fontSize: '15px', fontWeight: 'bold',
-            background: '#2EC4B6', color: 'white', border: 'none',
-            borderRadius: '12px', cursor: 'pointer',
-          }}>
-            다시 하기
-          </button>
-        </div>
+      {/* 버튼 영역 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px', paddingBottom: '40px' }}>
+        <button
+          onClick={() => navigate('/match')}
+          style={{
+            padding: '16px', borderRadius: '14px', border: 'none',
+            background: '#10b981', color: 'white', fontSize: '16px',
+            fontWeight: 'bold', cursor: 'pointer',
+          }}
+        >
+          💕 돈 궁합 보기
+        </button>
+        <button
+          onClick={() => navigate('/result')}
+          style={{
+            padding: '16px', borderRadius: '14px', border: '2px solid #10b981',
+            background: 'white', color: '#10b981', fontSize: '16px',
+            fontWeight: 'bold', cursor: 'pointer',
+          }}
+        >
+          ← 결과 요약으로
+        </button>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            padding: '16px', borderRadius: '14px', border: 'none',
+            background: '#f3f4f6', color: '#666', fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          🔄 테스트 다시 하기
+        </button>
       </div>
     </div>
   );
