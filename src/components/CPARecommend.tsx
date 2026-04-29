@@ -1,16 +1,14 @@
 // src/components/CPARecommend.tsx
 import React from 'react';
 
-// ✅ 웹 브라우저에서 정상 접근 가능한 공식 링크만 사용
 const CPA_LINKS = {
-  TOSS_SAVINGS: "https://www.tossbank.com/product-service/savings/account",   // 토스뱅크 통장 (입출금+이자)
-  TOSS_INVEST: "https://www.tossinvest.com/",                                 // 토스증권
-  TOSS_BANK: "https://www.tossbank.com/",                                     // 토스뱅크 메인
-  TOSS_CARD: "https://www.tossbank.com/product-service/card/check-card",      // 토스뱅크 체크카드
-  TOSS_INSURANCE: "https://tossinsu.com/",                                     // 토스인슈어런스
+  TOSS_SAVINGS: "https://www.tossbank.com/product-service/savings/account",
+  TOSS_INVEST: "https://www.tossinvest.com/",
+  TOSS_BANK: "https://www.tossbank.com/",
+  TOSS_CARD: "https://www.tossbank.com/product-service/card/check-card",
+  TOSS_INSURANCE: "https://tossinsu.com/",
 };
 
-// 유형별 추천 금융상품 매핑 (8개 유형)
 const productsByType: Record<string, { id: string; name: string; description: string; link: string; tag: string }[]> = {
   HTCS: [
     { id: "p1", name: "토스증권", description: "주식·ETF 투자로 자산을 빠르게 불려보세요", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
@@ -46,13 +44,11 @@ const productsByType: Record<string, { id: string; name: string; description: st
   ],
 };
 
-// 기본 추천 (매칭 안 될 경우)
 const defaultProducts = [
   { id: "d1", name: "토스뱅크 통장", description: "매일 이자 받는 입출금 통장을 시작해보세요", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
   { id: "d2", name: "토스증권", description: "소액부터 시작하는 쉬운 투자", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
 ];
 
-// 태그 색상
 const tagColors: Record<string, { bg: string; text: string }> = {
   투자: { bg: "#ede9fe", text: "#7c3aed" },
   카드: { bg: "#fef3c7", text: "#d97706" },
@@ -68,7 +64,6 @@ export default function CPARecommend({ typeCode }: Props) {
   const products = productsByType[typeCode] || defaultProducts;
 
   const handleClick = (productName: string) => {
-    // GA4 이벤트 트래킹
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("event", "cpa_click", {
         product_name: productName,
@@ -108,16 +103,10 @@ export default function CPARecommend({ typeCode }: Props) {
             >
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      padding: "3px 8px",
-                      borderRadius: "6px",
-                      background: colors.bg,
-                      color: colors.text,
-                    }}
-                  >
+                  <span style={{
+                    fontSize: "11px", fontWeight: "700", padding: "3px 8px",
+                    borderRadius: "6px", background: colors.bg, color: colors.text,
+                  }}>
                     {product.tag}
                   </span>
                   <span style={{ fontSize: "15px", fontWeight: "600", color: "#1e293b" }}>
