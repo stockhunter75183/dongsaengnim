@@ -1,46 +1,63 @@
 // src/components/CPARecommend.tsx
+import React from 'react';
 
-interface Product {
-  category: string;
-  categoryColor: string;
-  name: string;
-  provider: string;
-  description: string;
-}
+// ✅ 웹 브라우저에서 정상 접근 가능한 공식 링크만 사용
+const CPA_LINKS = {
+  TOSS_SAVINGS: "https://www.tossbank.com/product-service/savings/account",   // 토스뱅크 통장 (입출금+이자)
+  TOSS_INVEST: "https://www.tossinvest.com/",                                 // 토스증권
+  TOSS_BANK: "https://www.tossbank.com/",                                     // 토스뱅크 메인
+  TOSS_CARD: "https://www.tossbank.com/product-service/card/check-card",      // 토스뱅크 체크카드
+  TOSS_INSURANCE: "https://tossinsu.com/",                                     // 토스인슈어런스
+};
 
-const productsByType: Record<string, Product[]> = {
+// 유형별 추천 금융상품 매핑 (8개 유형)
+const productsByType: Record<string, { id: string; name: string; description: string; link: string; tag: string }[]> = {
   HTCS: [
-    { category: '카드', categoryColor: '#FF6B6B', name: '토스 FLEX 신용카드', provider: '토스뱅크', description: '쇼핑·외식 5% 캐시백으로 플렉스 극대화' },
-    { category: '저축', categoryColor: '#2EC4B6', name: '26주 적금 챌린지', provider: '토스뱅크', description: '매주 조금씩 늘려가는 자동 저축 습관 만들기' },
+    { id: "p1", name: "토스증권", description: "주식·ETF 투자로 자산을 빠르게 불려보세요", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
+    { id: "p2", name: "토스뱅크 체크카드", description: "소비할 때마다 캐시백 혜택을 받아보세요", link: CPA_LINKS.TOSS_CARD, tag: "카드" },
   ],
   HTCT: [
-    { category: '카드', categoryColor: '#FF6B6B', name: '토스 모임통장 체크카드', provider: '토스뱅크', description: '모임비 관리와 더치페이가 한번에' },
-    { category: '보험', categoryColor: '#9B59B6', name: '해외여행자 보험', provider: '토스 인슈어런스', description: '친구들과 여행 전 3초 가입, 1일 690원부터' },
+    { id: "p1", name: "토스뱅크 체크카드", description: "트렌디한 소비에 캐시백까지 챙기세요", link: CPA_LINKS.TOSS_CARD, tag: "카드" },
+    { id: "p2", name: "토스증권", description: "관심 있는 브랜드에 소액 투자해보세요", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
   ],
   HSTS: [
-    { category: '저축', categoryColor: '#2EC4B6', name: '토스 목표 저금통', provider: '토스', description: '세일로 아낀 금액만큼 자동 저축해보세요' },
-    { category: '투자', categoryColor: '#3498DB', name: '소액 주식 투자', provider: '토스증권', description: '1000원부터 시작하는 주식 투자' },
+    { id: "p1", name: "토스증권", description: "직감을 투자 감각으로! 소액부터 시작해보세요", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
+    { id: "p2", name: "토스인슈어런스", description: "예상치 못한 지출에 대비하는 보험 확인", link: CPA_LINKS.TOSS_INSURANCE, tag: "보험" },
   ],
   HSTT: [
-    { category: '카드', categoryColor: '#FF6B6B', name: '토스 모임통장 체크카드', provider: '토스뱅크', description: '모임비 자동 정산, 공동구매 관리에 딱' },
-    { category: '투자', categoryColor: '#3498DB', name: '투자 스터디 모임', provider: '토스증권', description: '친구와 함께 소액 투자 시작하기' },
+    { id: "p1", name: "토스뱅크 체크카드", description: "친구들과 함께 쓸 때 캐시백 혜택!", link: CPA_LINKS.TOSS_CARD, tag: "카드" },
+    { id: "p2", name: "토스뱅크 통장", description: "함께 모으는 목표 저축을 시작해보세요", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
   ],
   CTCS: [
-    { category: '투자', categoryColor: '#3498DB', name: 'ETF 자동투자', provider: '토스증권', description: '매월 자동으로 분산투자, 계획적 자산 증식' },
-    { category: '저축', categoryColor: '#2EC4B6', name: '시즌별 쇼핑 예산 적금', provider: '토스뱅크', description: '분기별 쇼핑 예산을 미리 모아두세요' },
+    { id: "p1", name: "토스뱅크 통장", description: "체계적으로 돈을 모으는 입출금 통장", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
+    { id: "p2", name: "토스증권", description: "분석적인 당신에게 딱! 데이터 기반 투자", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
   ],
   CTCT: [
-    { category: '카드', categoryColor: '#FF6B6B', name: '토스 경조사 봉투', provider: '토스', description: '경조사비 송금과 메시지를 한번에' },
-    { category: '투자', categoryColor: '#3498DB', name: '함께 투자 랭킹', provider: '토스증권', description: '친구들과 수익률 비교하며 재테크' },
+    { id: "p1", name: "토스증권", description: "스마트한 투자로 자산을 불려보세요", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
+    { id: "p2", name: "토스뱅크 체크카드", description: "똑똑한 소비 습관에 캐시백까지", link: CPA_LINKS.TOSS_CARD, tag: "카드" },
   ],
   CSSS: [
-    { category: '투자', categoryColor: '#3498DB', name: '예금 금리 비교', provider: '토스', description: '최고 금리 예적금을 한눈에 비교하세요' },
-    { category: '투자', categoryColor: '#3498DB', name: 'CMA 통장', provider: '토스증권', description: '하루만 맡겨도 이자가 붙는 똑똑한 통장' },
+    { id: "p1", name: "토스뱅크 통장", description: "안전하게 이자 받으며 차곡차곡 모으세요", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
+    { id: "p2", name: "토스인슈어런스", description: "만약의 상황에 대비하는 보험 점검", link: CPA_LINKS.TOSS_INSURANCE, tag: "보험" },
   ],
   CSST: [
-    { category: '저축', categoryColor: '#2EC4B6', name: '토스 목표 저금통', provider: '토스', description: '함께 목표 설정하고 저축하기' },
-    { category: '투자', categoryColor: '#3498DB', name: '소액 주식 투자', provider: '토스증권', description: '1000원부터 시작하는 주식 투자' },
+    { id: "p1", name: "토스뱅크 통장", description: "절약한 돈을 모아 이자까지 받아보세요", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
+    { id: "p2", name: "토스뱅크 체크카드", description: "알뜰한 소비에 캐시백 보너스!", link: CPA_LINKS.TOSS_CARD, tag: "카드" },
   ],
+};
+
+// 기본 추천 (매칭 안 될 경우)
+const defaultProducts = [
+  { id: "d1", name: "토스뱅크 통장", description: "매일 이자 받는 입출금 통장을 시작해보세요", link: CPA_LINKS.TOSS_SAVINGS, tag: "저축" },
+  { id: "d2", name: "토스증권", description: "소액부터 시작하는 쉬운 투자", link: CPA_LINKS.TOSS_INVEST, tag: "투자" },
+];
+
+// 태그 색상
+const tagColors: Record<string, { bg: string; text: string }> = {
+  투자: { bg: "#ede9fe", text: "#7c3aed" },
+  카드: { bg: "#fef3c7", text: "#d97706" },
+  저축: { bg: "#d1fae5", text: "#059669" },
+  보험: { bg: "#dbeafe", text: "#2563eb" },
 };
 
 interface Props {
@@ -48,69 +65,79 @@ interface Props {
 }
 
 export default function CPARecommend({ typeCode }: Props) {
-  const products = productsByType[typeCode] || productsByType['CSST'];
+  const products = productsByType[typeCode] || defaultProducts;
+
+  const handleClick = (productName: string) => {
+    // GA4 이벤트 트래킹
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "cpa_click", {
+        product_name: productName,
+        type_code: typeCode,
+      });
+    }
+  };
 
   return (
-    <div style={{
-      width: '100%',
-      background: 'white',
-      borderRadius: '16px',
-      padding: '20px',
-      marginBottom: '16px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-    }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
-        💰 돈생님 추천 금융상품
-      </h3>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {products.map((product, index) => (
-          <div
-            key={index}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-              padding: '14px',
-              background: '#F8F9FA',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#F0F0F0'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#F8F9FA'; }}
-          >
-            {/* 카테고리 배지 */}
-            <div style={{
-              minWidth: '48px',
-              height: '48px',
-              background: product.categoryColor,
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '13px',
-              fontWeight: 'bold',
-            }}>
-              {product.category}
-            </div>
-
-            {/* 상품 정보 */}
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '2px' }}>
-                {product.name}
-              </p>
-              <p style={{ fontSize: '12px', color: '#888', marginBottom: '2px' }}>
-                {product.provider}
-              </p>
-              <p style={{ fontSize: '13px', color: '#2EC4B6' }}>
-                {product.description}
-              </p>
-            </div>
-          </div>
-        ))}
+    <div>
+      <h2 style={{ fontSize: "16px", marginBottom: "14px", fontWeight: "700", color: "#1e293b" }}>
+        💳 나에게 맞는 금융상품
+      </h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {products.map((product) => {
+          const colors = tagColors[product.tag] || { bg: "#f1f5f9", text: "#475569" };
+          return (
+            <a
+              key={product.id}
+              href={product.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => handleClick(product.name)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "16px",
+                borderRadius: "14px",
+                border: "1px solid #e2e8f0",
+                background: "#fafbfc",
+                textDecoration: "none",
+                color: "inherit",
+                transition: "all 0.2s",
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "700",
+                      padding: "3px 8px",
+                      borderRadius: "6px",
+                      background: colors.bg,
+                      color: colors.text,
+                    }}
+                  >
+                    {product.tag}
+                  </span>
+                  <span style={{ fontSize: "15px", fontWeight: "600", color: "#1e293b" }}>
+                    {product.name}
+                  </span>
+                </div>
+                <p style={{ fontSize: "13px", color: "#64748b", margin: 0, lineHeight: "1.4" }}>
+                  {product.description}
+                </p>
+              </div>
+              <span style={{ fontSize: "13px", color: "#94a3b8", marginLeft: "12px", flexShrink: 0 }}>
+                자세히 보기 →
+              </span>
+            </a>
+          );
+        })}
       </div>
+      <p style={{ fontSize: "11px", color: "#cbd5e1", textAlign: "center", marginTop: "12px" }}>
+        * 광고성 콘텐츠가 포함되어 있습니다
+      </p>
     </div>
   );
 }
