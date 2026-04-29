@@ -73,7 +73,7 @@ export default function CPARecommend({ typeCode }: Props) {
   };
 
   return (
-    <div>
+    <div style={{ marginTop: "24px" }}>
       <h2 style={{ fontSize: "16px", marginBottom: "14px", fontWeight: "700", color: "#1e293b" }}>
         💳 나에게 맞는 금융상품
       </h2>
