@@ -1,5 +1,4 @@
 // src/components/CPARecommend.tsx
-import React from 'react';
 
 const CPA_LINKS = {
   TOSS_SAVINGS: "https://www.tossbank.com/product-service/savings/account",
